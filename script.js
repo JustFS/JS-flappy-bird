@@ -1,6 +1,7 @@
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const img = new Image();
+img.src = './media/flappy-bird-set.png';
 
 // general settings
 let gamePlaying = false;
@@ -27,10 +28,10 @@ const setup = () => {
   flight = jump;
 
   // set initial flyHeight (middle of screen - size of the bird)
-  flyHeight = (canvas.height / 2) - (size[1] / 2)
+  flyHeight = (canvas.height / 2) - (size[1] / 2);
 
   // setup first 3 pipes
-  pipes = Array(3).fill().map((a, i) => [canvas.width + (i * (pipeGap + pipeWidth)), pipeLoc()])
+  pipes = Array(3).fill().map((a, i) => [canvas.width + (i * (pipeGap + pipeWidth)), pipeLoc()]);
 }
 
 const render = () => {
@@ -55,14 +56,15 @@ const render = () => {
       // bottom pipe
       ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipe[1] + pipeGap, pipe[0], pipe[1] + pipeGap, pipeWidth, canvas.height - pipe[1] + pipeGap);
 
-      // take one point
+      // take one point+create new pipe
       if(pipe[0] <= -pipeWidth){
         currentScore++;
         // check if it's the best score
         bestScore = Math.max(bestScore, currentScore);
         
-        // remove pipe of the DOM
+        // remove & create new pipe
         pipes = [...pipes.slice(1), [pipes[pipes.length-1][0] + pipeGap + pipeWidth, pipeLoc()]];
+        console.log(pipes);
       }
     
       // if hit the pipe, end
@@ -100,7 +102,6 @@ const render = () => {
 // launch setup
 setup();
 img.onload = render;
-img.src = './media/flappy-bird-set.png';
 
 // start game
 document.addEventListener('click', () => gamePlaying = true);
