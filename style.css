@@ -4,13 +4,13 @@ body {
   margin: 0;
   text-align: center;
   font-family: 'Press Start 2P', cursive;
+  user-select: none;
 }
 header {
   margin: 0 auto;
-  width: 432px;
+  width: 431px;
 }
 h1 {
-  user-select: none;
   background: url(./media/flappy-bird-set.png) 0% 340px;
   padding: 1.2rem 0;
   margin: 0;

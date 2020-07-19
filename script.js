@@ -3,17 +3,12 @@ const ctx = canvas.getContext('2d');
 const img = new Image();
 
 // general settings
+let gamePlaying = false;
 const gravity = .5;
 const speed = 6.2;
 const size = [51, 36];
 const jump = -11.5;
 const cTenth = (canvas.width / 10);
-let gamePlaying = false;
-
-// pipe settings
-const pipeWidth = 78;
-const pipeGap = 260;
-const pipeLoc = () => (Math.random() * ((canvas.height - (pipeGap + pipeWidth)) - pipeWidth)) + pipeWidth;
 
 let index = 0,
     bestScore = 0, 
@@ -22,11 +17,16 @@ let index = 0,
     currentScore, 
     pipe;
 
+// pipe settings
+const pipeWidth = 78;
+const pipeGap = 270;
+const pipeLoc = () => (Math.random() * ((canvas.height - (pipeGap + pipeWidth)) - pipeWidth)) + pipeWidth;
+
 const setup = () => {
   currentScore = 0;
   flight = jump;
 
-  // set basic flyHeight (middle of screen - size of the bird)
+  // set initial flyHeight (middle of screen - size of the bird)
   flyHeight = (canvas.height / 2) - (size[1] / 2)
 
   // setup first 3 pipes
@@ -34,39 +34,43 @@ const setup = () => {
 }
 
 const render = () => {
-  // faire avancer le jeu
+  // make the pipe and bird moving 
   index++;
 
-  // mise en place du canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  // background Première partie 
+  // ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // background first part 
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height, -((index * (speed / 2)) % canvas.width) + canvas.width, 0, canvas.width, canvas.height);
-  // background deuxième partie
+  // background second part
   ctx.drawImage(img, 0, 0, canvas.width, canvas.height, -(index * (speed / 2)) % canvas.width, 0, canvas.width, canvas.height);
   
-  // mise en place des pipes
+  // pipe display
   if (gamePlaying){
     pipes.map(pipe => {
-      // pipes se rapprochent
+      // pipe moving
       pipe[0] -= speed;
 
-      // pipe du haut
+      // top pipe
       ctx.drawImage(img, 432, 588 - pipe[1], pipeWidth, pipe[1], pipe[0], 0, pipeWidth, pipe[1]);
-      // pipe du bas
+      // bottom pipe
       ctx.drawImage(img, 432 + pipeWidth, 108, pipeWidth, canvas.height - pipe[1] + pipeGap, pipe[0], pipe[1] + pipeGap, pipeWidth, canvas.height - pipe[1] + pipeGap);
 
-      // quand on passe le pipe prend un point
+      // take one point
       if(pipe[0] <= -pipeWidth){
         currentScore++;
-        // si jamais on bat le meilleur score
+        // check if it's the best score
         bestScore = Math.max(bestScore, currentScore);
         
-        // retirer le pipe quand il est passé
+        // remove pipe of the DOM
         pipes = [...pipes.slice(1), [pipes[pipes.length-1][0] + pipeGap + pipeWidth, pipeLoc()]];
       }
     
       // if hit the pipe, end
-      if ([pipe[0] <= cTenth + size[0], pipe[0] + pipeWidth >= cTenth, pipe[1] > flyHeight || pipe[1] + pipeGap < flyHeight + size[1]].every(c => c)) {
+      if ([
+        pipe[0] <= cTenth + size[0], 
+        pipe[0] + pipeWidth >= cTenth, 
+        pipe[1] > flyHeight || pipe[1] + pipeGap < flyHeight + size[1]
+      ].every(elem => elem)) {
         gamePlaying = false;
         setup();
       }
@@ -89,7 +93,7 @@ const render = () => {
   document.getElementById('bestScore').innerHTML = `Meilleur : ${bestScore}`;
   document.getElementById('currentScore').innerHTML = `Actuel : ${currentScore}`;
 
-  // demander au navigateur de relancer l'animation avant la fin de celle-ci (donne l'impresison de fluidité)
+  // tell the browser to perform anim
   window.requestAnimationFrame(render);
 }
 
@@ -98,8 +102,6 @@ setup();
 img.onload = render;
 img.src = './media/flappy-bird-set.png';
 
-//start game
-document.addEventListener('click', () => {
-  gamePlaying = true;  
-})
+// start game
+document.addEventListener('click', () => gamePlaying = true);
 window.onclick = () => flight = jump;
